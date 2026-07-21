@@ -1,9 +1,14 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "narendra1018/react-pipeline"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+    }
+
     stages {
 
-        stage("Install") {
+        stage('Install Dependencies') {
             steps {
                 dir('my-app') {
                     sh 'npm install'
@@ -11,7 +16,7 @@ pipeline {
             }
         }
 
-        stage("Build") {
+        stage('Build React App') {
             steps {
                 dir('my-app') {
                     sh 'npm run build'
@@ -19,24 +24,36 @@ pipeline {
             }
         }
 
-        stage("Archive") {
+        stage('Build Docker Image') {
             steps {
-                archiveArtifacts artifacts: 'my-app/dist/**', fingerprint: true
+                dir('my-app') {
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withDockerRegistry([credentialsId: 'dockerhub']) {
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${IMAGE_NAME}:latest"
+                }
             }
         }
     }
 
     post {
         success {
-            echo "Build completed successfully."
+            echo '✅ Image pushed to Docker Hub successfully!'
         }
 
         failure {
-            echo "Build failed. Please check the console logs."
+            echo '❌ Pipeline failed.'
         }
 
         always {
-            echo "Pipeline execution finished."
+            echo 'Pipeline execution finished.'
         }
     }
 }
