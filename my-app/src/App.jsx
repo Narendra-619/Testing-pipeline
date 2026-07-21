@@ -5,7 +5,7 @@ function App() {
     <div className="container">
       <h1>🚀 Jenkins CI/CD Pipeline Test</h1>
       <p>If you can see this, the pipeline worked successfully in ohio!</p>
-      <button onClick={() => alert("Pipeline Test Successful and check succesful and integrating it with dockerous!")}>
+      <button onClick={() => alert("Pipeline Test Successful and check succesful and integrating it with dockerous again!")}>
         Click Me
       </button>
     </div>
