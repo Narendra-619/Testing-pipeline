@@ -1,41 +1,42 @@
-pipeline{
+pipeline {
     agent any
-        stages{
-            stage("Pulling from repo"){
-                steps{
-                    echo "pulling the latest from the repo"
 
-                }
-                
-            }
-            stage("Install"){
+    stages {
 
-            
-            steps{
-                sh "npm install"
-            }
-            }
-            stage("Build"){
-                    steps{
-                        sh "npm run build"
-                    }
-            }
-            stage("archive"){
-                steps {
-                archiveArtifacts artifacts: 'dist/**'
+        stage("Install") {
+            steps {
+                dir('my-app') {
+                    sh 'npm install'
                 }
             }
-
-            
         }
-        post{
-            success{
-                echo "Everything is succesful"
 
+        stage("Build") {
+            steps {
+                dir('my-app') {
+                    sh 'npm run build'
+                }
             }
-            failure
-            {
-                echo "check the project nigga"
+        }
+
+        stage("Archive") {
+            steps {
+                archiveArtifacts artifacts: 'my-app/dist/**', fingerprint: true
             }
         }
     }
+
+    post {
+        success {
+            echo "Build completed successfully."
+        }
+
+        failure {
+            echo "Build failed. Please check the console logs."
+        }
+
+        always {
+            echo "Pipeline execution finished."
+        }
+    }
+}
