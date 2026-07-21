@@ -1,0 +1,41 @@
+pipeline{
+    agent any
+        stages{
+            stage("Pulling from repo"){
+                steps{
+                    echo "pulling the latest from the repo"
+
+                }
+                
+            }
+            stage("Install"){
+
+            
+            steps{
+                sh "npm install"
+            }
+            }
+            stage("Build"){
+                    steps{
+                        sh "npm run build"
+                    }
+            }
+            stage("archive"){
+                steps {
+                archiveArtifacts artifacts: 'dist/**'
+                }
+            }
+
+            
+        }
+        post{
+            success{
+                echo "Everything is succesful"
+
+            }
+            failure
+            {
+                echo "check the project nigga"
+            }
+        }
+    }
